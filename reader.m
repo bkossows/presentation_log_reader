@@ -2,10 +2,10 @@
 %% B. Kossowski
 
 %% Run in batch mode
-% files=spm_select; for i=1:size(files,1); filename=files(i,:); reader; end;
+%files=spm_select; for i=1:size(files,1); filename=files(i,:); reader; end;
 
 %% Initialize variables.
-%filename='/Users/bkossows/Lokalne/kasia-logi/dys047-ventral_loc_run2.log';
+filename='/Users/bkossows/Lokalne/kasia-logi/dys047-ventral_loc_run2.log';
 [folder,name,ext]=fileparts(filename);
 delimiter = '\t';
 startRow = 4;
@@ -105,7 +105,7 @@ Duration=Duration(1:finish)/1e4;
 
 %% Reference Time to the first scanner trigger
 start=find(strcmp(Code,'start'));
-s=find(strcmp(EventType,'Pulse'));
+s=find(strcmp(Code,'1'));
 if(s(1)>start)
     Time=Time-Time(s(1));
 else
@@ -118,23 +118,23 @@ end
 all_names=unique(Code); %review and select events accordingly
 
 names{1}='b_adapt';
-[onsets{1},codes{1}]=select_onsets(all_names(8:29)); %select onsets by all_names id
-durations{1}=select_durations(all_names(8:29));
+[onsets{1},codes{1}]=select_onsets('b'); %select onsets by all_names id
+durations{1}=select_durations('b');
 [onsets{1},durations{1}]=events2block(onsets{1},durations{1},codes{1},1); %concat and filter events
 
 names{2}='b_mix';
-[onsets{2},codes{2}]=select_onsets(all_names(8:29)); %select onsets by all_names id
-durations{2}=select_durations(all_names(8:29));
+[onsets{2},codes{2}]=select_onsets('b'); %select onsets by all_names id
+durations{2}=select_durations('b');
 [onsets{2},durations{2}]=events2block(onsets{2},durations{2},codes{2},2); %concat and filter events
 
 names{3}='c_adapt';
-[onsets{3},codes{3}]=select_onsets(all_names(30:51));
-durations{3}=select_durations(all_names(30:51));
+[onsets{3},codes{3}]=select_onsets('c');
+durations{3}=select_durations('c');
 [onsets{3},durations{3}]=events2block(onsets{3},durations{3},codes{3},2); %concat and filter events
 
 names{4}='rest';
-[onsets{4},codes{4}]=select_onsets(all_names(4:6));
-durations{4}=select_durations(all_names(4:6));
+[onsets{4},codes{4}]=select_onsets('ISI');
+durations{4}=select_durations('ISI');
 %[onsets{3},durations{3}]=events2block(onsets{3},durations{3},codes{3},2); %concat and filter events
 
 save(fullfile(folder,name),'names','onsets','durations')
@@ -168,14 +168,16 @@ end
 
 function [onsets,codes]=select_onsets(names)
     global Time Code
-    codes=strcmpM(Code,names);
+    %codes=strcmpM(Code,names);
+    codes=strncmp(Code,names,length(names));
     onsets=Time(codes);
     codes=Code(codes);
 end
 
 function durations=select_durations(names)
     global Duration Code
-    durations=Duration(strcmpM(Code,names));
+    %durations=Duration(strcmpM(Code,names));
+    durations=Duration(strncmp(Code,names,length(names)));
 end
 
 function ids=strcmpM(s1,s2)
