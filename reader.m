@@ -105,7 +105,8 @@ Duration=Duration(1:finish)/1e4;
 
 %% Reference Time to the first scanner trigger
 start=find(strcmp(Code,'start'));
-s=find(strcmp(Code,'1'));
+s=find(strcmp(EventType,'Pulse'));
+%s=find(strcmp(Code,'1')); %use when the pulses are not explicit
 if(s(1)>start)
     Time=Time-Time(s(1));
 else
